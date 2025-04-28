@@ -197,7 +197,6 @@ export const getAchievements = async () => {
   }
 };
 
-// 🔍 API untuk search siswa berdasarkan nama atau NISN
 export const searchStudent = async (query: string) => {
   try {
     const { token } = getSession();
@@ -214,12 +213,37 @@ export const searchStudent = async (query: string) => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
+    // Just return the data directly - don't process it here
     return response.data;
   } catch (error) {
     console.error("❌ Search Student Failed:", error);
     return [];
   }
 };
+
+// 🔍 API untuk search siswa berdasarkan nama atau NISN
+// export const searchStudent = async (query: string) => {
+//   try {
+//     const { token } = getSession();
+
+//     if (!token) {
+//       console.error("❌ No token found!");
+//       return [];
+//     }
+
+//     console.log("🔍 Searching students with query:", query);
+
+//     const response = await axios.get(`${API_URL}/admin/search-student`, {
+//       params: { query },
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("❌ Search Student Failed:", error);
+//     return [];
+//   }
+// };
 
 export const getCurrentUser = async () => {
   try {
