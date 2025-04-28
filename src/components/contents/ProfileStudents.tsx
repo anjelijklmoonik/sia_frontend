@@ -22,6 +22,16 @@ interface ProfileDataType {
   namaWali: string;
   noTelpWali: string;
   foto: string;
+  pendidikanSebelumnya: string;
+  pekerjaanAyah: string;
+  pekerjaanIbu: string;
+  jalanOrtu: string;
+  kelurahanOrtu: string;
+  kecamatanOrtu: string;
+  kabupatenOrtu: string;
+  provinsiOrtu: string;
+  pekerjaanWali: string;
+  alamatWali: string;
   [key: string]: string;
 }
 
@@ -46,8 +56,18 @@ const ProfileStudents = () => {
     namaWali: "",
     noTelpWali: "",
     foto: "",
+    pendidikanSebelumnya: "",
+    pekerjaanAyah: "",
+    pekerjaanIbu: "",
+    jalanOrtu: "",
+    kelurahanOrtu: "",
+    kecamatanOrtu: "",
+    kabupatenOrtu: "",
+    provinsiOrtu: "",
+    pekerjaanWali: "",
+    alamatWali: "",
   });
-  
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -80,6 +100,16 @@ const ProfileStudents = () => {
           namaWali: student.namaWali || "-",
           noTelpWali: student.noTelpWali || "-",
           foto: student.foto || "/foto.png",
+          pendidikanSebelumnya: student.pendidikanSebelumnya || "-",
+          pekerjaanAyah: student.pekerjaanAyah || "-",
+          pekerjaanIbu: student.pekerjaanIbu || "-",
+          jalanOrtu: student.jalanOrtu || "-",
+          kelurahanOrtu: student.kelurahanOrtu || "-",
+          kecamatanOrtu: student.kecamatanOrtu || "-",
+          kabupatenOrtu: student.kabupatenOrtu || "-",
+          provinsiOrtu: student.provinsiOrtu || "-",
+          pekerjaanWali: student.pekerjaanWali || "-",
+          alamatWali: student.alamatWali || "-",
         });
       } else {
         console.warn("⚠️ Data siswa tidak ditemukan.");
@@ -115,35 +145,119 @@ const ProfileStudents = () => {
                 <ProfileField label="Sekolah" value={profileData.sekolah} />
                 <ProfileField label="Kelas" value={profileData.kelas} />
                 <ProfileField label="Jurusan" value={profileData.jurusan} />
-                <ProfileField label="Jenis Kelamin" value={profileData.jenisKelamin} />
-                <ProfileField label="Tanggal Lahir" value={profileData.tanggalLahir} />
+                <ProfileField
+                  label="Jenis Kelamin"
+                  value={profileData.jenisKelamin}
+                />
+                <ProfileField
+                  label="Tanggal Lahir"
+                  value={profileData.tanggalLahir}
+                />
                 <ProfileField label="Agama" value={profileData.agama} />
+                <ProfileField
+                  label="Pendidikan Sebelumnya"
+                  value={profileData.pendidikanSebelumnya}
+                />
               </div>
-              
+
               {/* Alamat (Full Width) */}
               <div className="border-t pt-4">
-                <ProfileField label="Alamat" value={profileData.alamat} fullWidth />
+                <ProfileField
+                  label="Alamat"
+                  value={profileData.alamat}
+                  fullWidth
+                />
               </div>
-              
+
               {/* Kontak */}
               <div className="border-t pt-4">
                 <h2 className="text-xl font-semibold mb-4">Informasi Kontak</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <ProfileField label="No. Telepon" value={profileData.noTelp} />
+                  <ProfileField
+                    label="No. Telepon"
+                    value={profileData.noTelp}
+                  />
                   <ProfileField label="Email" value={profileData.email} />
                 </div>
               </div>
-              
+
               {/* Informasi Keluarga */}
               <div className="border-t pt-4">
-                <h2 className="text-xl font-semibold mb-4">Informasi Keluarga</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Informasi Keluarga
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <ProfileField label="Nama Ayah" value={profileData.namaAyah} />
-                  <ProfileField label="No. Telepon Ayah" value={profileData.noTelpAyah} />
-                  <ProfileField label="Nama Ibu" value={profileData.namaIbu} />
-                  <ProfileField label="No. Telepon Ibu" value={profileData.noTelpIbu} />
-                  <ProfileField label="Nama Wali" value={profileData.namaWali} />
-                  <ProfileField label="No. Telepon Wali" value={profileData.noTelpWali} />
+                  <ProfileField
+                    label="Nama Ayah"
+                    value={profileData.namaAyah}
+                  />
+                  <ProfileField
+                    label="No. Telepon Ayah"
+                    value={profileData.noTelpAyah}
+                  />
+                  <ProfileField
+                    label="Pekerjaan Ayah"
+                    value={profileData.pekerjaanIbu}
+                  />
+                  <ProfileField
+                    label="Nama Ibu"
+                    value={profileData.pekerjaanAyah}
+                  />
+                  <ProfileField
+                    label="No. Telepon Ibu"
+                    value={profileData.noTelpIbu}
+                  />
+                  <ProfileField
+                    label="Pekerjaan Ibu"
+                    value={profileData.pekerjaanIbu}
+                  />
+                  <ProfileField
+                    label="No. Telepon Ibu"
+                    value={profileData.noTelpIbu}
+                  />
+                  <div className="border-t pt-4">
+                    <h2 className="text-xl font-semibold mb-4">
+                      Alamat Orang Tua
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <ProfileField
+                        label="Jalan"
+                        value={profileData.jalanOrtu}
+                      />
+                      <ProfileField
+                        label="Kelurahan/ Desa"
+                        value={profileData.kelurahanOrtu}
+                      />
+                      <ProfileField
+                        label="Kecamatan"
+                        value={profileData.kecamatanOrtu}
+                      />
+                      <ProfileField
+                        label="Kabupaten/ Kota"
+                        value={profileData.kabupatenOrtu}
+                      />
+                      <ProfileField
+                        label="Provinsi"
+                        value={profileData.provinsiOrtu}
+                      />
+                    </div>
+                  </div>
+                  <ProfileField
+                    label="Nama Wali"
+                    value={profileData.namaWali}
+                  />
+                  <ProfileField
+                    label="No. Telepon Wali"
+                    value={profileData.noTelpWali}
+                  />
+                  <ProfileField
+                    label="Pekerjaan Wali"
+                    value={profileData.pekerjaanWali}
+                  />
+                  <ProfileField
+                    label="Alamat Wali"
+                    value={profileData.alamatWali}
+                  />
                 </div>
               </div>
             </div>
@@ -155,8 +269,16 @@ const ProfileStudents = () => {
 };
 
 // Komponen untuk field profil yang hanya bisa dibaca
-const ProfileField = ({ label, value, fullWidth = false }: { label: string; value: string; fullWidth?: boolean }) => (
-  <div className={`${fullWidth ? 'col-span-full' : ''}`}>
+const ProfileField = ({
+  label,
+  value,
+  fullWidth = false,
+}: {
+  label: string;
+  value: string;
+  fullWidth?: boolean;
+}) => (
+  <div className={`${fullWidth ? "col-span-full" : ""}`}>
     <div className="flex flex-col">
       <label className="font-semibold text-gray-700">{label}</label>
       <div className="p-2 bg-gray-50 border rounded-md text-gray-800 mt-1">

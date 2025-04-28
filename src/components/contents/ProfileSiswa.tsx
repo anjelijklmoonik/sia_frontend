@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllClasses, postClassMember, postStudentProfile } from "@/app/api/admin";
+import {
+  getAllClasses,
+  postClassMember,
+  postStudentProfile,
+} from "@/app/api/admin";
 import { toast, Toaster } from "react-hot-toast";
 
 interface SiswaProfile {
@@ -22,6 +26,16 @@ interface SiswaProfile {
   noTelpIbu?: string;
   namaWali?: string;
   noTelpWali?: string;
+  pendidikanSebelumnya?: string;
+  pekerjaanAyah?: string;
+  pekerjaanIbu?: string;
+  jalanOrtu?: string;
+  kelurahanOrtu?: string;
+  kecamatanOrtu?: string;
+  kabupatenOrtu?: string;
+  provinsiOrtu?: string;
+  pekerjaanWali?: string;
+  alamatWali?: string;
 }
 
 interface KelasOption {
@@ -32,10 +46,10 @@ interface KelasOption {
   academicYearId: number;
   jurusan?: {
     nama: string;
-  }
+  };
   academicYear?: {
     year: number;
-  }
+  };
 }
 
 const agamaOptions = [
@@ -44,7 +58,7 @@ const agamaOptions = [
   "Islam",
   "Hindu",
   "Buddha",
-  "Konghucu"
+  "Konghucu",
 ];
 
 const jurusanOptions = [
@@ -70,6 +84,16 @@ const initialProfile: SiswaProfile = {
   noTelpIbu: "",
   namaWali: "",
   noTelpWali: "",
+  pendidikanSebelumnya: "",
+  pekerjaanAyah: "",
+  pekerjaanIbu: "",
+  jalanOrtu: "",
+  kelurahanOrtu: "",
+  kecamatanOrtu: "",
+  kabupatenOrtu: "",
+  provinsiOrtu: "",
+  pekerjaanWali: "",
+  alamatWali: "",
 };
 
 export default function ProfileSiswaForm() {
@@ -78,7 +102,7 @@ export default function ProfileSiswaForm() {
   const [classes, setClasses] = useState<KelasOption[]>([]);
   const [filteredClasses, setFilteredClasses] = useState<KelasOption[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<string>("GANJIL");
-  
+
   // Fetch all classes when component mounts
   useEffect(() => {
     const fetchClasses = async () => {
@@ -86,7 +110,7 @@ export default function ProfileSiswaForm() {
         const allClasses = await getAllClasses();
         console.log("Fetched classes:", allClasses);
         setClasses(allClasses);
-        
+
         // Initially filter classes based on SMA
         filterClassesBySelection("SMA", undefined, "GANJIL");
       } catch (error) {
@@ -94,32 +118,34 @@ export default function ProfileSiswaForm() {
         toast.error("Gagal memuat data kelas");
       }
     };
-    
+
     fetchClasses();
   }, []);
-  
+
   // Filter classes based on selected school, jurusan, and semester
   const filterClassesBySelection = (
-    sekolah: string, 
-    jurusanId: number | undefined, 
+    sekolah: string,
+    jurusanId: number | undefined,
     semester: string
   ) => {
     // For SMA, jurusanId is 1, for SMK it's whatever is selected
     const targetJurusanId = sekolah === "SMA" ? 1 : jurusanId;
-    
+
     // Filter classes by jurusanId and semester
-    const filtered = classes.filter(kelas => 
-      kelas.jurusanId === targetJurusanId && 
-      kelas.semester === semester
+    const filtered = classes.filter(
+      (kelas) =>
+        kelas.jurusanId === targetJurusanId && kelas.semester === semester
     );
-    
+
     console.log("Filtered classes:", filtered);
     setFilteredClasses(filtered);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setProfile(prev => ({
+    setProfile((prev) => ({
       ...prev,
       [name]: name === "jurusanId" ? Number(value) : value,
     }));
@@ -128,62 +154,64 @@ export default function ProfileSiswaForm() {
   const handleSekolahChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as "SMA" | "SMK";
     const newJurusanId = value === "SMK" ? jurusanOptions[0].id : undefined;
-    
-    setProfile(prev => ({
+
+    setProfile((prev) => ({
       ...prev,
       sekolah: value,
       jurusanId: newJurusanId,
       kelasId: 0, // Reset kelasId when school changes
     }));
-    
+
     // Filter classes when school changes
     filterClassesBySelection(value, newJurusanId, selectedSemester);
   };
-  
+
   const handleJurusanChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const jurusanId = Number(e.target.value);
-    
-    setProfile(prev => ({
+
+    setProfile((prev) => ({
       ...prev,
       jurusanId,
       kelasId: 0, // Reset kelasId when jurusan changes
     }));
-    
+
     // Filter classes when jurusan changes
     filterClassesBySelection(profile.sekolah, jurusanId, selectedSemester);
   };
-  
+
   const handleSemesterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const semester = e.target.value;
     setSelectedSemester(semester);
-    
+
     // Reset selected class when semester changes
-    setProfile(prev => ({
+    setProfile((prev) => ({
       ...prev,
-      kelasId: 0
+      kelasId: 0,
     }));
-    
+
     // Filter classes when semester changes
     filterClassesBySelection(profile.sekolah, profile.jurusanId, semester);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!profile.kelasId) {
       toast.error("Silakan pilih kelas terlebih dahulu!");
       return;
     }
-    
+
     setLoading(true);
 
     try {
-      const selectedClass = filteredClasses.find(c => c.id === profile.kelasId);
-      
+      const selectedClass = filteredClasses.find(
+        (c) => c.id === profile.kelasId
+      );
+
       if (!selectedClass) {
         throw new Error("Kelas tidak ditemukan");
       }
-      
+
       // Prepare data to send (convert kelasId to kelas for backend)
       const dataToSend = {
         ...profile,
@@ -193,7 +221,7 @@ export default function ProfileSiswaForm() {
 
       console.log("Sending data:", dataToSend);
       const savedStudent = await postStudentProfile(dataToSend);
-      
+
       if (!savedStudent?.id) throw new Error("Student ID not returned");
 
       // Add student to class using the selected kelasId
@@ -204,7 +232,6 @@ export default function ProfileSiswaForm() {
       setTimeout(() => {
         setProfile(initialProfile);
       }, 500);
-
     } catch (err) {
       console.error(err);
       toast.error("Gagal menyimpan data siswa.");
@@ -215,10 +242,11 @@ export default function ProfileSiswaForm() {
 
   // Format class display for select element
   const formatClassOption = (kelas: KelasOption) => {
-    const jurusanName = profile.sekolah === "SMK" 
-      ? (jurusanOptions.find(j => j.id === kelas.jurusanId)?.name || "") 
-      : "";
-      
+    const jurusanName =
+      profile.sekolah === "SMK"
+        ? jurusanOptions.find((j) => j.id === kelas.jurusanId)?.name || ""
+        : "";
+
     return `${kelas.noKelas} ${jurusanName}`;
   };
 
@@ -227,10 +255,23 @@ export default function ProfileSiswaForm() {
       <Toaster position="top-right" />
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-4">Formulir Data Siswa</h1>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Nama" name="nama" value={profile.nama} onChange={handleChange} />
-          <Input label="Nomor Induk Siswa (NIS)" name="noIndukSiswa" value={profile.noIndukSiswa} onChange={handleChange} />
-          
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <Input
+            label="Nama Peserta Didik"
+            name="nama"
+            value={profile.nama}
+            onChange={handleChange}
+          />
+          <Input
+            label="Nomor Induk Siswa (NISN)"
+            name="noIndukSiswa"
+            value={profile.noIndukSiswa}
+            onChange={handleChange}
+          />
+
           <div>
             <label className="font-semibold text-gray-700">Sekolah:</label>
             <select
@@ -243,7 +284,7 @@ export default function ProfileSiswaForm() {
               <option value="SMK">SMK</option>
             </select>
           </div>
-          
+
           <div>
             <label className="font-semibold text-gray-700">Semester:</label>
             <select
@@ -266,22 +307,29 @@ export default function ProfileSiswaForm() {
                 className="w-full p-2 border rounded-md"
               >
                 {jurusanOptions.map((j) => (
-                  <option key={j.id} value={j.id}>{j.name}</option>
+                  <option key={j.id} value={j.id}>
+                    {j.name}
+                  </option>
                 ))}
               </select>
             </div>
           )}
-          
+
           <div>
             <label className="font-semibold text-gray-700">Kelas:</label>
             <select
               name="kelasId"
               value={profile.kelasId}
-              onChange={(e) => setProfile(prev => ({...prev, kelasId: Number(e.target.value)}))}
+              onChange={(e) =>
+                setProfile((prev) => ({
+                  ...prev,
+                  kelasId: Number(e.target.value),
+                }))
+              }
               className="w-full p-2 border rounded-md"
             >
               <option value="0">-- Pilih Kelas --</option>
-              {filteredClasses.map(kelas => (
+              {filteredClasses.map((kelas) => (
                 <option key={kelas.id} value={kelas.id}>
                   {formatClassOption(kelas)}
                 </option>
@@ -289,24 +337,163 @@ export default function ProfileSiswaForm() {
             </select>
           </div>
 
-          <Input label="Alamat" name="alamat" value={profile.alamat} onChange={handleChange} required />
-          <Input label="Tanggal Lahir" name="ttl" type="date" value={profile.ttl} onChange={handleChange} required />
-          <Select label="Jenis Kelamin" name="jenisKelamin" value={profile.jenisKelamin} onChange={handleChange} options={["Laki-laki", "Perempuan"]} />
+          <Input
+            label="Alamat Peserta Didik"
+            name="alamat"
+            value={profile.alamat}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            label="Pendidikan Sebelumnya"
+            name="pendidikanSeb"
+            value={profile.pendidikanSebelumnya}
+            onChange={handleChange}
+          />
+          <Input
+            label="Tanggal Lahir"
+            name="ttl"
+            type="date"
+            value={profile.ttl}
+            onChange={handleChange}
+            required
+          />
+          <Select
+            label="Jenis Kelamin"
+            name="jenisKelamin"
+            value={profile.jenisKelamin}
+            onChange={handleChange}
+            options={["Laki-laki", "Perempuan"]}
+          />
 
           {/* Tambahan field baru */}
-          <Select label="Agama" name="agama" value={profile.agama} onChange={handleChange} options={agamaOptions} />
-          <Input label="No Telepon" name="noTelp" value={profile.noTelp} onChange={handleChange} type="tel" />
-          <Input label="Email" name="email" value={profile.email} onChange={handleChange} type="email" />
+          <Select
+            label="Agama"
+            name="agama"
+            value={profile.agama}
+            onChange={handleChange}
+            options={agamaOptions}
+          />
+          <Input
+            label="No Telepon"
+            name="noTelp"
+            value={profile.noTelp}
+            onChange={handleChange}
+            type="tel"
+          />
+          <Input
+            label="Email"
+            name="email"
+            value={profile.email}
+            onChange={handleChange}
+            type="email"
+          />
 
           <div className="col-span-2 border-t pt-4 mt-4">
-            <h3 className="text-lg font-semibold mb-2">Data Orang Tua/Wali (Opsional)</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Data Orang Tua/Wali (Opsional)
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Nama Ayah" name="namaAyah" value={profile.namaAyah} onChange={handleChange} />
-              <Input label="No Telepon Ayah" name="noTelpAyah" value={profile.noTelpAyah} onChange={handleChange} type="tel" />
-              <Input label="Nama Ibu" name="namaIbu" value={profile.namaIbu} onChange={handleChange} />
-              <Input label="No Telepon Ibu" name="noTelpIbu" value={profile.noTelpIbu} onChange={handleChange} type="tel" />
-              <Input label="Nama Wali" name="namaWali" value={profile.namaWali} onChange={handleChange} />
-              <Input label="No Telepon Wali" name="noTelpWali" value={profile.noTelpWali} onChange={handleChange} type="tel" />
+              <Input
+                label="Nama Ayah"
+                name="namaAyah"
+                value={profile.namaAyah}
+                onChange={handleChange}
+              />
+              <Input
+                label="Nama Ibu"
+                name="namaIbu"
+                value={profile.namaIbu}
+                onChange={handleChange}
+              />
+              <Input
+                label="No Telepon Ayah"
+                name="noTelpAyah"
+                value={profile.noTelpAyah}
+                onChange={handleChange}
+                type="tel"
+              />
+              <Input
+                label="No Telepon Ibu"
+                name="noTelpIbu"
+                value={profile.noTelpIbu}
+                onChange={handleChange}
+                type="tel"
+              />
+              <Input
+                label="Pekerjaan Ayah"
+                name="pekerjaanAyah"
+                value={profile.pekerjaanAyah}
+                onChange={handleChange}
+              />
+              <Input
+                label="Pekerjaan Ibu"
+                name="pekerjaanIbu"
+                value={profile.pekerjaanIbu}
+                onChange={handleChange}
+              />
+              <div className="col-span-2 border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-2">
+                  Alamat Orang Tua (Opsional)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Jalan"
+                    name="alamatJalan"
+                    value={profile.jalanOrtu}
+                    onChange={handleChange}
+                  />
+                  <Input
+                    label="Kelurahan/ Desa"
+                    name="alamatKelDes"
+                    value={profile.kelurahanOrtu}
+                    onChange={handleChange}
+                  />
+                  <Input
+                    label="Kecamatan"
+                    name="alamatKecamatan"
+                    value={profile.kecamatanOrtu}
+                    onChange={handleChange}
+                  />
+                  <Input
+                    label="Kabupaten/ Kota"
+                    name="alamatKabKot"
+                    value={profile.kabupatenOrtu}
+                    onChange={handleChange}
+                  />
+                  <Input
+                    label="Provinsi"
+                    name="alamatProvinsi"
+                    value={profile.provinsiOrtu}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <Input
+                label="Nama Wali"
+                name="namaWali"
+                value={profile.namaWali}
+                onChange={handleChange}
+              />
+              <Input
+                label="No Telepon Wali"
+                name="noTelpWali"
+                value={profile.noTelpWali}
+                onChange={handleChange}
+                type="tel"
+              />
+              <Input
+                label="Pekerjaan Wali"
+                name="pekerjaanWali"
+                value={profile.pekerjaanWali}
+                onChange={handleChange}
+              />
+              <Input
+                label="Alamat Wali"
+                name="alamatWali"
+                value={profile.alamatWali}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -350,7 +537,9 @@ const Select = ({ label, name, value, onChange, options }: any) => (
       className="w-full p-2 border rounded-md"
     >
       {options.map((opt: string) => (
-        <option key={opt} value={opt}>{opt}</option>
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
       ))}
     </select>
   </div>
