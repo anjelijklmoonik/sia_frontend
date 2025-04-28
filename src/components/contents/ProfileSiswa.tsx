@@ -84,7 +84,7 @@ const initialProfile: SiswaProfile = {
   noTelpIbu: "",
   namaWali: "",
   noTelpWali: "",
-  pendidikanSebelumnya: "",
+  pendidikanSebelumnya: "SMP",
   pekerjaanAyah: "",
   pekerjaanIbu: "",
   jalanOrtu: "",
@@ -346,7 +346,7 @@ export default function ProfileSiswaForm() {
           />
           <Input
             label="Pendidikan Sebelumnya"
-            name="pendidikanSeb"
+            name="pendidikanSebelumnya"
             value={profile.pendidikanSebelumnya}
             onChange={handleChange}
           />
@@ -439,31 +439,31 @@ export default function ProfileSiswaForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Jalan"
-                    name="alamatJalan"
+                    name="jalanOrtu"
                     value={profile.jalanOrtu}
                     onChange={handleChange}
                   />
                   <Input
                     label="Kelurahan/ Desa"
-                    name="alamatKelDes"
+                    name="kelurahanOrtu"
                     value={profile.kelurahanOrtu}
                     onChange={handleChange}
                   />
                   <Input
                     label="Kecamatan"
-                    name="alamatKecamatan"
+                    name="kecamatanOrtu"
                     value={profile.kecamatanOrtu}
                     onChange={handleChange}
                   />
                   <Input
                     label="Kabupaten/ Kota"
-                    name="alamatKabKot"
+                    name="kabupatenOrtu"
                     value={profile.kabupatenOrtu}
                     onChange={handleChange}
                   />
                   <Input
                     label="Provinsi"
-                    name="alamatProvinsi"
+                    name="provinsiOrtu"
                     value={profile.provinsiOrtu}
                     onChange={handleChange}
                   />
