@@ -274,13 +274,14 @@ export const getJurusanDanKelas = async () => {
 export const postNilaiSiswa = async (
   studentProfileId: number,
   mapelKelasId: number,
-  skor: number
+  skor: number,
+  capaianKompetensi?: string
 ) => {
   try {
     const { token } = getSession();
     const response = await axios.post(
       `${API_URL}/grades`,
-      { studentProfileId, mapelKelasId, skor },
+      { studentProfileId, mapelKelasId, skor, capaianKompetensi },
       { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log("✅ Nilai berhasil ditambahkan:", response.data);

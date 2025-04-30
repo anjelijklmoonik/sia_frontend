@@ -158,15 +158,7 @@ const ProfileStudents = () => {
                   label="Pendidikan Sebelumnya"
                   value={profileData.pendidikanSebelumnya}
                 />
-              </div>
-
-              {/* Alamat (Full Width) */}
-              <div className="border-t pt-4">
-                <ProfileField
-                  label="Alamat"
-                  value={profileData.alamat}
-                  fullWidth
-                />
+                <ProfileField label="Alamat" value={profileData.alamat} />
               </div>
 
               {/* Kontak */}

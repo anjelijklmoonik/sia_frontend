@@ -20,6 +20,9 @@ export default function PilihKelas() {
   const [nilaiMapel, setNilaiMapel] = useState<{ [mapelId: number]: number }>(
     {}
   );
+  const [capaianKompetensi, setCapaianKompetensi] = useState<{
+    [mapelId: number]: string;
+  }>({});
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,6 +77,7 @@ export default function PilihKelas() {
     setSelectedSiswa(null);
     setMapelOptions([]);
   };
+
   const handleKelasChange = async (selected: any) => {
     setSelectedKelas(selected?.value || null);
     setSelectedSemester(null);
@@ -158,6 +162,8 @@ export default function PilihKelas() {
 
     setSelectedSiswa(siswa.value);
     setMapelOptions([]);
+    setNilaiMapel({});
+    setCapaianKompetensi({});
 
     try {
       const mapelList: { id: number; namaMapel: string }[] = [];
@@ -174,13 +180,24 @@ export default function PilihKelas() {
             });
 
             if (mapel.nilai.length > 0) {
-              setNilaiMapel((prev) => ({
-                ...prev,
-                [mapel.id]:
-                  mapel.nilai.find(
-                    (n: any) => n.studentProfilId === siswa.value.id
-                  )?.skor || 0,
-              }));
+              const nilaiSiswa = mapel.nilai.find(
+                (n: any) => n.studentProfilId === siswa.value.id
+              );
+
+              if (nilaiSiswa) {
+                setNilaiMapel((prev) => ({
+                  ...prev,
+                  [mapel.id]: nilaiSiswa.skor || 0,
+                }));
+
+                // Set capaian kompetensi jika ada
+                if (nilaiSiswa.capaianKompetensi) {
+                  setCapaianKompetensi((prev) => ({
+                    ...prev,
+                    [mapel.id]: nilaiSiswa.capaianKompetensi,
+                  }));
+                }
+              }
             }
           });
         }
@@ -199,6 +216,13 @@ export default function PilihKelas() {
     }));
   };
 
+  const handleCapaianChange = (mapelId: number, capaian: string) => {
+    setCapaianKompetensi((prev) => ({
+      ...prev,
+      [mapelId]: capaian,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!selectedSiswa || !selectedSiswa.id) {
       toast.error("Pilih siswa terlebih dahulu.");
@@ -212,13 +236,21 @@ export default function PilihKelas() {
         studentProfileId: selectedSiswa.id,
         mapelKelasId: Number(mapelId),
         skor: skor,
+        capaianKompetensi: capaianKompetensi[Number(mapelId)] || "",
       }));
 
+      // Kirim data nilai siswa ke backend
       await Promise.all(
         nilaiToSend.map((nilai) =>
-          postNilaiSiswa(nilai.studentProfileId, nilai.mapelKelasId, nilai.skor)
+          postNilaiSiswa(
+            nilai.studentProfileId,
+            nilai.mapelKelasId,
+            nilai.skor,
+            nilai.capaianKompetensi
+          )
         )
       );
+
       toast.success("Nilai berhasil disimpan.");
     } catch (error) {
       toast.error("Gagal menyimpan nilai.");
@@ -281,33 +313,62 @@ export default function PilihKelas() {
               />
             )}
             {mapelOptions.length > 0 && (
-              <table className="w-full bg-gray-50 shadow-md rounded-lg mt-4">
-                <tbody>
-                  {mapelOptions.map((mapel) => (
-                    <tr key={mapel.id} className="border-b">
-                      <td className="p-2">{mapel.namaMapel}</td>
-                      <td className="p-2">
-                        <input
-                          type="number"
-                          value={nilaiMapel[mapel.id] ?? ""}
-                          onChange={(e) =>
-                            handleNilaiChange(mapel.id, Number(e.target.value))
-                          }
-                          className="p-1 border rounded-md"
-                        />
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full bg-gray-50 shadow-md rounded-lg mt-4">
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th className="px-4 py-2 text-left">Mata Pelajaran</th>
+                      <th className="px-4 py-2 text-center">Nilai Akhir</th>
+                      <th className="px-4 py-2 text-left">
+                        Capaian Kompetensi
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {mapelOptions.map((mapel) => (
+                      <tr key={mapel.id} className="border-b hover:bg-gray-100">
+                        <td className="p-3">{mapel.namaMapel}</td>
+                        <td className="p-3 text-center">
+                          <input
+                            type="number"
+                            value={nilaiMapel[mapel.id] ?? ""}
+                            onChange={(e) =>
+                              handleNilaiChange(
+                                mapel.id,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="p-2 border rounded-md w-20 text-center"
+                            min="0"
+                            max="100"
+                          />
+                        </td>
+                        <td className="p-3">
+                          <textarea
+                            value={capaianKompetensi[mapel.id] ?? ""}
+                            onChange={(e) =>
+                              handleCapaianChange(mapel.id, e.target.value)
+                            }
+                            className="p-2 border rounded-md w-full"
+                            rows={2}
+                            placeholder="Masukkan capaian kompetensi "
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              {isSubmitting ? "Menyimpan..." : "Simpan Nilai"}
-            </button>
+            {mapelOptions.length > 0 && (
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Menyimpan..." : "Simpan Nilai"}
+              </button>
+            )}
           </>
         )}
       </div>
