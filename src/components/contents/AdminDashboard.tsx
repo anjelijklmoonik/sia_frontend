@@ -20,11 +20,10 @@ export default function AdminDashboard() {
         console.error("Failed to fetch data:", error);
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, []);
-  
 
   // Aturan Sekolah
   const schoolRules = [
@@ -52,15 +51,17 @@ export default function AdminDashboard() {
     <div className="p-6 min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Staff Admin</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Staf</h1>
 
         {/* Statistik Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="bg-white p-5 rounded-lg shadow-lg flex items-center space-x-4 hover:shadow-xl transition">
-          <FaSchool className="text-yellow-500 text-4xl" />
+            <FaSchool className="text-yellow-500 text-4xl" />
             <div>
               <p className="text-gray-600">Total Siswa SMA</p>
-              <h2 className="text-2xl font-bold">{loading ? "Loading..." : totalSMA}</h2>
+              <h2 className="text-2xl font-bold">
+                {loading ? "Loading..." : totalSMA}
+              </h2>
             </div>
           </div>
 
@@ -68,7 +69,9 @@ export default function AdminDashboard() {
             <FaSchool className="text-blue-500 text-4xl" />
             <div>
               <p className="text-gray-600">Total Siswa SMK</p>
-              <h2 className="text-2xl font-bold">{loading ? "Loading..." : totalSMK}</h2>
+              <h2 className="text-2xl font-bold">
+                {loading ? "Loading..." : totalSMK}
+              </h2>
             </div>
           </div>
         </div>
@@ -87,8 +90,13 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {schoolRules.map((rule, index) => (
-                <tr key={index} className="bg-white hover:bg-gray-100 transition">
-                  <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}.</td>
+                <tr
+                  key={index}
+                  className="bg-white hover:bg-gray-100 transition"
+                >
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    {index + 1}.
+                  </td>
                   <td className="border border-gray-300 px-4 py-2">{rule}</td>
                 </tr>
               ))}
@@ -105,20 +113,31 @@ export default function AdminDashboard() {
             <thead className="bg-gray-200">
               <tr>
                 <th className="border border-gray-300 px-4 py-2">Keterangan</th>
-                <th className="border border-gray-300 px-4 py-2">Biaya (BLN / SEM)</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Biaya (BLN / SEM)
+                </th>
               </tr>
             </thead>
             <tbody>
               {financeData.map((item, index) => (
-                <tr key={index} className="bg-white hover:bg-gray-100 transition">
-                  <td className="border border-gray-300 px-4 py-2">{item.keterangan}</td>
-                  <td className="border border-gray-300 px-4 py-2">{item.biaya}</td>
+                <tr
+                  key={index}
+                  className="bg-white hover:bg-gray-100 transition"
+                >
+                  <td className="border border-gray-300 px-4 py-2">
+                    {item.keterangan}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {item.biaya}
+                  </td>
                 </tr>
               ))}
             </tbody>
             <tfoot className="bg-gray-100">
               <tr>
-                <td className="font-bold border border-gray-300 px-4 py-2">TOTAL</td>
+                <td className="font-bold border border-gray-300 px-4 py-2">
+                  TOTAL
+                </td>
                 <td className="font-bold border border-gray-300 px-4 py-2">
                   Rp. 567.000 / Rp. 3.400.000
                 </td>

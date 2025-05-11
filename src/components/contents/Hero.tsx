@@ -11,7 +11,10 @@ const Hero = () => {
           {/* Left: Welcome Text */}
           <div className="lg:w-1/2 text-center lg:text-left">
             <h1 className="text-5xl font-extrabold mb-4 animate-fadeIn">
-              Welcome to <br /> <span className="text-yellow-700">HAI SIR</span>
+              Welcome to <br />{" "}
+              <span className="text-yellow-700">
+                SMA-SMK ADVENT KLABAT MANADO
+              </span>
             </h1>
             <p className="text-lg text-gray-800 mb-8 animate-fadeIn">
               Tempat pendidikan yang berfokus pada pengembangan karakter, iman,

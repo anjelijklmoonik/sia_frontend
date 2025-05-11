@@ -1,3 +1,340 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { toast, Toaster } from "react-hot-toast";
+// import { searchStudent, getKeuangan, postKeuangan } from "@/app/api/admin";
+// import { Loader } from "lucide-react";
+
+// interface Siswa {
+//   id: number;
+//   nama: string;
+//   noIndukSiswa: string;
+// }
+
+// interface Keuangan {
+//   id?: number;
+//   studentProfilId: number;
+//   keterangan: string;
+//   tanggal: string;
+//   jumlah: number;
+//   namaSiswa?: string;
+// }
+
+// export default function ManajemenKeuangan() {
+//   const [nisInput, setNisInput] = useState("");
+//   const [searchLoading, setSearchLoading] = useState(false);
+//   const [selectedStudent, setSelectedStudent] = useState<Siswa | null>(null);
+//   const [searchResults, setSearchResults] = useState<Siswa[]>([]);
+//   const [form, setForm] = useState<Omit<Keuangan, "id" | "namaSiswa">>({
+//     amount: 0,
+//     referensi: "",
+//     noJurnal: "",
+//     type: "DEBIT",
+//     deskripsi: "",
+//     transDate: "",
+//     keuanganId: undefined,
+//   });
+//   const [loading, setLoading] = useState(false);
+//   const [financeList, setFinanceList] = useState<Keuangan[]>([]);
+
+//   useEffect(() => {
+//     fetchFinanceData();
+//   }, []);
+
+//   const fetchFinanceData = async () => {
+//     const data = await getKeuangan();
+//     setFinanceList(data || []);
+//   };
+
+//   const handleSearchStudent = async () => {
+//     if (!nisInput.trim()) {
+//       toast.error("❌ Masukkan Nomor Induk Siswa (NIS)!");
+//       return;
+//     }
+
+//     setSearchLoading(true);
+//     try {
+//       const data = await searchStudent(nisInput);
+//       if (data && data.length > 0) {
+//         setSearchResults(data);
+//         if (data.length === 1) {
+//           handleSelectStudent(data[0]);
+//         }
+//       } else {
+//         toast.error("❌ Siswa tidak ditemukan!");
+//         setSearchResults([]);
+//       }
+//     } catch (error) {
+//       console.error("Gagal mencari siswa:", error);
+//       toast.error("❌ Terjadi kesalahan saat mencari siswa.");
+//       setSearchResults([]);
+//     } finally {
+//       setSearchLoading(false);
+//     }
+//   };
+
+//   const handleSelectStudent = (student: Siswa) => {
+//     setSelectedStudent(student);
+//     setForm((prev) => ({
+//       ...prev,
+//       studentProfilId: student.id,
+//     }));
+//     setSearchResults([]);
+//     toast.success(`✅ Siswa ${student.nama} dipilih!`);
+//   };
+
+//   const handleNisChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setNisInput(e.target.value);
+//   };
+
+//   const handleChange = (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+//   ) => {
+//     const { name, value } = e.target;
+//     setForm((prev) => ({
+//       ...prev,
+//       [name]: name === "jumlah" ? Number(value) : value,
+//     }));
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     if (!form.deskripsi || !form.transDate || form.amount <= 0) {
+//       toast.error("❌ Semua kolom wajib diisi!");
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       const formattedDate = new Date(
+//         form.tanggal + "T00:00:00.000Z"
+//       ).toISOString();
+
+//       const payload = {
+//         ...form,
+//         tanggal: formattedDate,
+//       };
+
+//       await postKeuangan(payload);
+//       toast.success("✅ Transaksi berhasil ditambahkan!");
+//       fetchFinanceData();
+
+//       // Reset form
+//       setForm({
+//         amount: 0,
+//         referensi: "",
+//         noJurnal: "",
+//         type: "DEBIT",
+//         deskripsi: "",
+//         transDate: "",
+//       });
+//       setSelectedStudent(null);
+//       setNisInput("");
+//     } catch (error) {
+//       console.error("Gagal tambah transaksi:", error);
+//       toast.error("❌ Gagal menambahkan transaksi.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="p-6 bg-gray-100 min-h-screen">
+//       <Toaster position="top-right" />
+//       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
+//         <h1 className="text-2xl font-bold mb-4">Manajemen Keuangan Siswa</h1>
+
+//         {/* 🔍 Cari Siswa */}
+//         <div className="mb-6 bg-yellow-50 p-4 rounded border border-yellow-200">
+//           <h2 className="text-lg font-semibold mb-2">
+//             Cari Siswa Berdasarkan NIS
+//           </h2>
+//           <div className="flex space-x-2">
+//             <input
+//               type="text"
+//               value={nisInput}
+//               onChange={handleNisChange}
+//               placeholder="Masukkan NIS"
+//               className="flex-1 border p-2 rounded"
+//             />
+//             <button
+//               onClick={handleSearchStudent}
+//               disabled={searchLoading}
+//               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
+//             >
+//               {searchLoading ? "Mencari..." : "Cari"}
+//             </button>
+//           </div>
+
+//           {searchResults.length > 0 && (
+//             <div className="mt-2 bg-white border rounded p-2 max-h-40 overflow-y-auto">
+//               {searchResults.map((siswa) => (
+//                 <div key={siswa.id} className="mb-1">
+//                   <button
+//                     onClick={() => handleSelectStudent(siswa)}
+//                     className="w-full text-left p-1 hover:bg-gray-100 rounded"
+//                   >
+//                     {siswa.nama} (NIS: {siswa.noIndukSiswa})
+//                   </button>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+
+//           {selectedStudent && (
+//             <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
+//               <p className="text-sm">
+//                 Siswa Terpilih: <strong>{selectedStudent.nama}</strong> (NIS:{" "}
+//                 {selectedStudent.noIndukSiswa})
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* 🧾 Form Tambah Transaksi */}
+//         <form
+//           onSubmit={handleSubmit}
+//           className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
+//         >
+//           <div>
+//             <label className="text-gray-700 font-semibold">Tanggal:</label>
+//             <input
+//               type="date"
+//               name="transDate"
+//               value={form.transDate}
+//               onChange={handleChange}
+//               required
+//               className="w-full p-2 border rounded-md"
+//             />
+//           </div>
+
+//           <div>
+//             <label className="text-gray-700 font-semibold">Deskripsi:</label>
+//             <textarea
+//               name="deskripsi"
+//               value={form.deskripsi}
+//               onChange={handleChange}
+//               required
+//               className="w-full p-2 border rounded-md"
+//             />
+//           </div>
+
+//           <div>
+//             <label className="text-gray-700 font-semibold">Jumlah (Rp):</label>
+//             <input
+//               type="number"
+//               name="amount"
+//               value={form.amount || ""}
+//               onChange={handleChange}
+//               min="1" // Mencegah nilai 0 atau negatif
+//               className="w-full p-2 border rounded-md"
+//               placeholder="Masukkan jumlah"
+//               onKeyDown={(e) => {
+//                 if (e.key === "-" || e.key === "e") {
+//                   e.preventDefault(); // Mencegah input angka negatif dan huruf eksponensial
+//                 }
+//               }}
+//             />
+//           </div>
+
+//           <div>
+//             <label className="text-gray-700 font-semibold">Tipe:</label>
+//             <select
+//               name="type"
+//               value={form.type}
+//               onChange={handleChange}
+//               className="w-full p-2 border rounded-md"
+//             >
+//               <option value="DEBIT">DEBIT</option>
+//               <option value="KREDIT">KREDIT</option>
+//             </select>
+//           </div>
+
+//           <div>
+//             <label className="text-gray-700 font-semibold">Referensi:</label>
+//             <input
+//               type="text"
+//               name="referensi"
+//               value={form.referensi}
+//               onChange={handleChange}
+//               className="w-full p-2 border rounded-md"
+//             />
+//           </div>
+
+//           <div>
+//             <label className="text-gray-700 font-semibold">No Jurnal:</label>
+//             <input
+//               type="text"
+//               name="noJurnal"
+//               value={form.noJurnal}
+//               onChange={handleChange}
+//               className="w-full p-2 border rounded-md"
+//             />
+//           </div>
+//           <div className="flex justify-center md:col-span-2">
+//             <button
+//               type="submit"
+//               className={`bg-yellow-500 text-white px-4 py-2 rounded-lg font
+//     hover:bg-yellow-600 transition flex items-center justify-center gap-2 ${
+//       loading ? "opacity-50 cursor-not-allowed" : ""
+//     }`}
+//               disabled={loading} // ✅ Mencegah klik saat loading
+//             >
+//               {loading ? (
+//                 <Loader className="animate-spin w-5 h-5" />
+//               ) : (
+//                 "Tambah Transaksi"
+//               )}
+//             </button>
+//           </div>
+//         </form>
+
+//         {/* 📊 Tabel Data Transaksi */}
+//         <div>
+//           <h2 className="text-lg font-semibold mb-2">
+//             Daftar Transaksi Keuangan
+//           </h2>
+//           <table className="w-full bg-gray-50 border rounded shadow">
+//             <thead className="bg-gray-200">
+//               <tr>
+//                 <th className="p-2 text-left">Nama Siswa</th>
+//                 <th className="p-2 text-left">Keterangan</th>
+//                 <th className="p-2 text-left">Tanggal</th>
+//                 <th className="p-2 text-left">Jumlah</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {financeList.length > 0 ? (
+//                 financeList.map((item) => (
+//                   <tr key={item.id} className="border-t">
+//                     <td className="p-2">
+//                       {item.namaSiswa || "Tidak diketahui"}
+//                     </td>
+//                     <td className="p-2">{item.keterangan}</td>
+//                     <td className="p-2">
+//                       {new Date(item.tanggal).toLocaleDateString("id-ID")}
+//                     </td>
+//                     <td className="p-2">
+//                       Rp {item.jumlah.toLocaleString("id-ID")}
+//                     </td>
+//                   </tr>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan={4} className="text-center text-gray-500 p-4">
+//                     Belum ada data transaksi
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 "use client";
 
 import { useState, useEffect } from "react";
